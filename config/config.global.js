@@ -33,16 +33,17 @@ config.output.file = 'output.json';
 config.scheduler = {};
 config.scheduler.activity = {};
 config.scheduler.activity.activityName = 'CONTENT_DISCOVERY';
-config.scheduler.preferences = {};
-config.scheduler.preferences.jsonataTransform = '';
-config.scheduler.preferences.sftp = {};
-config.scheduler.preferences.sftp.filenamePrefix = 'dataexport';
-config.scheduler.preferences.sftp.sftpConfigUuid = '00000000-0000-0000-0000-000000000000';
-config.scheduler.preferences.sftp.outputPath = 'exportpath';
-config.scheduler.preferences.csvOptions = {};
-config.scheduler.preferences.csvOptions.delimiter = ',';
-config.scheduler.preferences.csvOptions.header = true;
-config.scheduler.preferences.csvOptions.newline = '\r\n';
+config.scheduler.activity.preferences = {};
+config.scheduler.activity.preferences.action = 'CONTENT_EXPORT';
+config.scheduler.activity.preferences.jsonataTransform = '';
+config.scheduler.activity.preferences.sftp = {};
+config.scheduler.activity.preferences.sftp.filenamePrefix = 'dataexport';
+config.scheduler.activity.preferences.sftp.sftpConfigUuid = '00000000-0000-0000-0000-000000000000';
+config.scheduler.activity.preferences.sftp.outputPath = 'exportpath';
+config.scheduler.activity.preferences.csvOptions = {};
+config.scheduler.activity.preferences.csvOptions.delimiter = ',';
+config.scheduler.activity.preferences.csvOptions.header = true;
+config.scheduler.activity.preferences.csvOptions.newline = '\r\n';
 config.scheduler.startAt = moment()
   .round(1, 'hours')
   .add(1, 'hours')

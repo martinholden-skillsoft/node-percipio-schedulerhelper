@@ -81,7 +81,7 @@ const main = async configOptions => {
   let jsonataSource = fs.readFileSync(jsonataFile, 'utf8');
   jsonataSource = jsmin(jsonataSource);
 
-  options.scheduler.preferences.jsonataTransform = jsonataSource;
+  options.scheduler.activity.preferences.jsonataTransform = jsonataSource;
 
   // Save the transformed data
   let outputFile = options.output.file;
@@ -95,7 +95,7 @@ const main = async configOptions => {
   }
 
   logger.info(`Writing Scheduler Template: ${outputFile}`, loggingOptions);
-  fs.writeFileSync(outputFile, JSON.stringify(options.scheduler));
+  fs.writeFileSync(outputFile, JSON.stringify(options.scheduler, null, 2));
 
   return true;
 };

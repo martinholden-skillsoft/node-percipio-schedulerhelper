@@ -21,14 +21,14 @@ config.output.path = 'results/output';
 config.output.file = `${config.customer}.json`;
 
 // Scheduler Overrides
-config.scheduler.preferences.sftp.filenamePrefix = `${config.customer}_report`;
-config.scheduler.preferences.sftp.sftpConfigUuid = '00000000-0000-0000-0000-000000000000';
-config.scheduler.preferences.sftp.outputPath = `${config.customer}`;
+config.scheduler.activity.preferences.sftp.filenamePrefix = 'dataexport';
+config.scheduler.activity.preferences.sftp.sftpConfigUuid = '00000000-0000-0000-0000-000000000000';
+config.scheduler.activity.preferences.sftp.outputPath = 'exportpath';
 
 // Default startAt from now, rounded to hours and plaus 4 hours
 config.scheduler.startAt = moment()
   .round(1, 'hours')
-  .add(4, 'hours')
+  .add(1, 'hours')
   .toISOString();
 
 // Default JSONATA Input
