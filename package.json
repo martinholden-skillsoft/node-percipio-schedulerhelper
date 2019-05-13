@@ -1,0 +1,49 @@
+{
+  "name": "node-percipio-schedulerhelper",
+  "version": "0.0.0",
+  "description": "Tool to help prepare JSONata Transforms for scheduler API",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint app.js lib config",
+    "preversion": "npm run lint",
+    "postversion": "git push && git push --tags && npm run changelog && git push ",
+    "postinstall": "",
+    "changelog": "rimraf CHANGELOG.md && auto-changelog --template keepachangelog && git add . && git commit . -m changelog && git push",
+    "changelog2": "rimraf CHANGELOG.md && auto-changelog --template keepachangelog"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/martinholden-skillsoft/node-percipio-schedulerhelper.git"
+  },
+  "keywords": [
+    "skillsoft",
+    "percipio"
+  ],
+  "author": "Martin Holden &lt;martin.holden@skillsoft.com&gt;",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/martinholden-skillsoft/node-percipio-schedulerhelper/issues"
+  },
+  "dependencies": {
+    "jsmin": "^1.0.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "moment-round": "^1.0.1",
+    "pkginfo": "^0.4.1",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "auto-changelog": "^1.13.0",
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-prettier": "^3.0.1",
+    "eslint-plugin-react": "^7.11.0",
+    "prettier": "^1.16.4",
+    "rimraf": "^2.6.3"
+  }
+}
