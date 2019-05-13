@@ -51,9 +51,7 @@ $.(
                     $trimlength := $maxlength - $length($ellipsis);
 
 					$needtrim := ($length($input) > $maxlength);
-					$trimmedinput := $needtrim ? $trim($substring($input , 0, $trimlength));
-					
-                    $trimmedinput := $replace($trimmedinput, $wordboundary, '') & $ellipsis;
+					$trimmedinput := $needtrim ? $replace($trim($substring($input , 0, $trimlength)), $wordboundary, '') & $ellipsis;
 					$needtrim ? $trimmedinput : $input;
 			);
 
@@ -65,9 +63,8 @@ $.(
                     $trimlength := $maxlength - $length($ellipsis);
 
 					$needtrim := ($length($input) > $maxlength);
-					$trimmedinput := $needtrim ? $trim($substring($input , 0, $trimlength));
+                    $trimmedinput := $needtrim ? $replace($trim($substring($input , 0, $trimlength)), $wordboundary, '') & $ellipsis;
 					
-                    $trimmedinput := $replace($trimmedinput, $wordboundary, '') & $ellipsis;
 					$needtrim ? $trimmedinput : $input;
 			);
 
