@@ -35,11 +35,23 @@ config.scheduler.activity = {};
 config.scheduler.activity.activityName = 'CONTENT_DISCOVERY';
 config.scheduler.activity.preferences = {};
 config.scheduler.activity.preferences.action = 'CONTENT_EXPORT';
+
 config.scheduler.activity.preferences.jsonataTransform = '';
+
+config.scheduler.activity.preferences.filename = {};
+// The base name of the file that will be written to the SFTP directory
+config.scheduler.activity.preferences.filename.filenamePrefix = 'dataexport';
+// The end of the filename (e.g. json or csv)
+config.scheduler.activity.preferences.filename.filenameSuffix = 'csv';
+// The path to the folder on the SFTP server to place the output file
+config.scheduler.activity.preferences.filename.outputPath = 'exportpath';
+// Indicates that there should be no date timestamp appended at the end of filename.
+config.scheduler.activity.preferences.filename.includeDate = false;
+// Indicates that there should be no millis appended at the end of filename
+config.scheduler.activity.preferences.filename.includeMillis = false;
+
 config.scheduler.activity.preferences.sftp = {};
-config.scheduler.activity.preferences.sftp.filenamePrefix = 'dataexport';
 config.scheduler.activity.preferences.sftp.sftpConfigUuid = '00000000-0000-0000-0000-000000000000';
-config.scheduler.activity.preferences.sftp.outputPath = 'exportpath';
 config.scheduler.activity.preferences.csvOptions = {};
 config.scheduler.activity.preferences.csvOptions.delimiter = ',';
 config.scheduler.activity.preferences.csvOptions.header = true;
