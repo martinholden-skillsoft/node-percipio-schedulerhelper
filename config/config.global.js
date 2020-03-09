@@ -28,9 +28,16 @@ config.output = {};
 config.output.path = 'results';
 // File name for the data
 config.output.file = 'output.json';
+config.output.curl = 'curl.sh';
+
+config.orgid = '';
 
 // Scheduler Defaults
 config.scheduler = {};
+
+config.scheduler.isActive = true;
+config.scheduler.name = `A unique name ${config.startTimestamp}`;
+
 config.scheduler.activity = {};
 config.scheduler.activity.activityName = 'CONTENT_DISCOVERY';
 config.scheduler.activity.preferences = {};
@@ -64,6 +71,6 @@ config.scheduler.interval = moment.duration(1, 'd').toISOString();
 config.scheduler.jobConfig = {};
 config.scheduler.jobConfig.type = 'ASYNC';
 config.scheduler.jobConfig.maxAttemptCount = 5;
-config.scheduler.jobConfig.timeout = 120;
+config.scheduler.jobConfig.timeout = 720;
 
 module.exports = config;

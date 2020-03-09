@@ -1,11 +1,8 @@
-/*
-eslint linebreak-style: ["error", "windows"]
-*/
-
 const fs = require('fs');
 const Path = require('path');
 const _ = require('lodash');
 const { jsmin } = require('jsmin');
+const HTTPSnippet = require('httpsnippet');
 
 // eslint-disable-next-line no-unused-vars
 const pkginfo = require('pkginfo')(module);
@@ -95,7 +92,42 @@ const main = async configOptions => {
   }
 
   logger.info(`Writing Scheduler Template: ${outputFile}`, loggingOptions);
-  fs.writeFileSync(outputFile, JSON.stringify(options.scheduler, null, 2));
+  const jsonPayload = JSON.stringify(options.scheduler, null, 2);
+  fs.writeFileSync(outputFile, jsonPayload);
+
+  const harpayload = jsonataSource;
+
+  const harrequest = {
+    method: 'POST',
+    url: `https://scheduler.percipio.com/v1/organizations/${options.orgid}/schedule`,
+    httpVersion: 'HTTP/1.1',
+    headers: [
+      {
+        name: 'content-type',
+        value: 'application/json'
+      },
+      {
+        name: 'Authorization',
+        value: 'Basic c2NoZWR1bGVyLXNlcnZpY2UtYXBwOnd6QzQ2TjZ1TFpLWkRyMUlsbXF2'
+      }
+    ],
+    postData: {
+      text: harpayload,
+      mimeType: 'application/json'
+    }
+  };
+
+  const snippet = new HTTPSnippet(harrequest);
+
+  const results = snippet.convert('shell', 'curl', {
+    indent: false
+  });
+
+  let curloutputFile = options.output.curl;
+  if (!_.isNull(options.output.path)) {
+    curloutputFile = Path.join(options.output.path, curloutputFile);
+  }
+  fs.writeFileSync(curloutputFile, results);
 
   return true;
 };

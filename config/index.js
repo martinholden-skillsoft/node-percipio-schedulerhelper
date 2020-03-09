@@ -1,6 +1,6 @@
-﻿const customer = process.env.CUSTOMER || 'default';
+﻿const config = process.env.CONFIG || 'default';
 
-const configFile = `config.${customer}`;
+const configFile = `config.${config}`;
 const configPath = `./${configFile}`;
 
 //

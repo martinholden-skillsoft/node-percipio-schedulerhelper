@@ -1,54 +1,11 @@
 $.(
     $comment := '*******************************************************';
     $comment := '*******************************************************';
-    $comment := 'TRANSFORM FOR SHAREPOINT FLOWS';
-    $comment := 'Used for Demo Loading a SharePoint list - my.percipio.com';
+    $comment := 'TRANSFORM FOR SABA RELEASE 45 - But with LOCAL thumbnbail';
     $comment := 'Author: Martin Holden';
-    $comment := 'Date: 07-FEB-2020';
-    $comment := '*******************************************************';
-    
+    $comment := 'Date: 19-SEP-2019';
     $comment := '*******************************************************';
     $comment := '*******************************************************';
-    $comment := 'Start of Overrides';
-    $comment := 'The example below defines overrides that match the defaults';
-    $comment := 'You actually only need to define the Overides needed, search for';
-    $comment := '$override. in this file to see the definition of each option';
-    
-    $override := {
-        'comment_common' : '{object} Common shared settings for metadata trasnforms',
-        'common' : {
-            'Comment_UseExtendedDescription' : '{boolean} Whether to use the extended description option. This combines the descripion and publication data. See the $metadataextendeddescription function',
-        	'UseExtendedDescription' : true,
-            'Comment_ExtendedDescriptionEOL' : '{string} The EOL characters to use for the Extended Description. See the $metadataextendeddescription function',
-            'ExtendedDescriptionEOL' : '\r\n',
-            'Comment_IncludeContentTypeInTitle' : '{boolean} Whether to include contentType.displayLabel as prefix to title. See the $metadatatitle function',
-            'IncludeContentTypeInTitle' : true,
-            'Comment_IncludeTechnologyDetailsInTitle' : '{boolean} Whether to include technologies[0].title and version as prefix to title. See the $metadatatitle function',
-            'IncludeTechnologyDetailsInTitle': true,
-            'Comment_ShareLinkParametersLookup' : '{object} The MAPPING between Percipio contentType.percipioType lowercase and any additions to the link. default option to handle unknown types. Returned value (right side) is the string to append to the link',
-            'ShareLinkParametersLookup' : {
-                'audiobook': '',
-                'book': '',
-                'channel': '',
-                'course': '',
-                'linked_content': '',
-                'video': '',
-                'journey': '',
-                'default': ''
-            },
-            'Comment_MobileShareLinkParametersLookup' : '{object} The MAPPING between Percipio contentType.percipioType lowercase and any additions to the link for Mobile. default option to handle unknown types. Returned value (right side) is the string to append to the link',
-            'MobileShareLinkParametersLookup' : {
-                'audiobook': '?chromeless=true&preventAppDownload=true',
-                'book': '?chromeless=true&preventAppDownload=true',
-                'channel': '?chromeless=true&preventAppDownload=true',
-                'course': '?chromeless=true&preventAppDownload=true',
-                'linked_content': '?chromeless=true&preventAppDownload=true',
-                'video': '?chromeless=true&preventAppDownload=true',
-                'journey': '?chromeless=true&preventAppDownload=true',
-                'default': '?chromeless=true&preventAppDownload=true'
-            }
-        }
-	};
 
     $comment := '*******************************************************';
     $comment := '*******************************************************';
@@ -493,6 +450,27 @@ $.(
             $result ? $result : $defaultLanguage;
     )};
 
+    $comment := '*******************************************************';
+    $comment := '* Remove any query string or hash parameters from a URL';
+    $comment := '* @param {string} $url - The URL string';
+    $comment := '* @returns {string}';
+    $comment := '*******************************************************';  
+	$stripQueryStringandHash := function($url){(
+    	$myurl := $url ? $url : '';
+    	$split( $myurl , /\#|\?/)[0];
+    )};
+    
+    $comment := '*******************************************************';
+    $comment := '* Get the document extension from a URL';
+    $comment := '* @param {string} $url - The URL string';
+    $comment := '* @returns {string}';
+    $comment := '*******************************************************';  
+    $getDocumentExtension := function($url){(
+    	$myurl := $url ? $url : '';
+        $mydocument := $reverse($split($myurl,'/'))[0];
+        $contains($mydocument, '.') ? $reverse($split($mydocument, '.'))[0] : ''
+    )};
+
 
     $comment := 'End of Generic Function Library';
     $comment := '*******************************************************';
@@ -583,9 +561,7 @@ $.(
     $comment := '* @returns {string}';
     $comment := '*******************************************************';
     $metadatasharelink := function($lookupValues){(
-        $urlparameter := $exists( $lookupValues) ? $lookup( $lookupValues, $lowercase(contentType.percipioType)) : null;
-        $urlparameter := $urlparameter ? $urlparameter : $exists( $lookupValues) ? $lookup( $lookupValues, 'default') : '';
-        
+        $urlparameter := $exists( $lookupValues) ? $lookup( $lookupValues, $lowercase(contentType.percipioType)) : '';
         link & $urlparameter;
     )};
 
@@ -609,7 +585,7 @@ $.(
 
     $comment := '* The EOL characters to use for the Extended Description';
     $comment := '* See the $metadataextendeddescription function above';
-    $commonExtendedDescriptionEOL := $exists($override.common.ExtendedDescriptionEOL) ? $override.common.ExtendedDescriptionEOL : '<br>';
+    $commonExtendedDescriptionEOL := $exists($override.common.ExtendedDescriptionEOL) ? $override.common.ExtendedDescriptionEOL : '\r\n';
 
     $comment := '* Whether to include contentType.displayLabel as prefix to title';
     $comment := '* See the $metadatatitle function above';
@@ -620,7 +596,7 @@ $.(
     $commonIncludeTechnologyDetailsInTitle := $exists($override.common.IncludeTechnologyDetailsInTitle) ? $override.common.IncludeTechnologyDetailsInTitle : true;
 
     $comment := '* The MAPPING between Percipio contentType.percipioType lowercase';
-    $comment := '* and any additions to the link. default option to handle unknown types';
+    $comment := '* and any additions to the link';
     $comment := '* Returned value (right side) is the string to append to the link';
     $comment := '* so for example to make a link chromeless include ?chromeless';
     $commonShareLinkParametersLookup := $exists($override.common.ShareLinkParametersLookup ) ? $override.common.ShareLinkParametersLookup : {
@@ -629,29 +605,279 @@ $.(
         'channel': '',
         'course': '',
         'linked_content': '',
-        'video': '',
-        'journey': '',
-        'default': ''
+        'video': ''
     };
 
     $comment := '* The MAPPING between Percipio contentType.percipioType lowercase';
-    $comment := '* and any additions to the link for MOBILE. default option to handle unknown types';
+    $comment := '* and any additions to the link for MOBILE';
     $comment := '* Returned value (right side) is the string to append to the link';
     $comment := '* so for example to make a link chromeless include ?chromeless';
     $commonMobileShareLinkParametersLookup := $exists($override.common.MobileShareLinkParametersLookup ) ? $override.common.MobileShareLinkParametersLookup : {
-        'audiobook': '',
-        'book': '',
-        'channel': '',
-        'course': '',
-        'linked_content': '',
-        'video': '',
-        'journey': '',
-        'default': ''
+        'audiobook': '?chromeless',
+        'book': '?chromeless',
+        'channel': '?chromeless',
+        'course': '?chromeless',
+        'linked_content': '?chromeless',
+        'video': '?chromeless'
     };
 
     $comment := 'End of Common Metadata Specific Variables';
     $comment := '*******************************************************';
     $comment := '*******************************************************';
+
+    $comment := '*******************************************************';
+    $comment := '*******************************************************';
+    $comment := 'Start of Saba Release 45/Customer Specific Functions';
+
+    $comment := '*******************************************************';
+    $comment := '* Create a string[] that is deduplicated of values that combines these';
+    $comment := '* data values:';
+    $comment := '*   localizedMetadata[0].title if contentType.percipioType is channel';
+    $comment := '*   keywords';
+    $comment := '*   associations.areas';
+    $comment := '*   associations.subjects';
+    $comment := '*   associations.channels[*].title';
+    $comment := '*   $otherKeyword variable';
+    $comment := '* @param {string} [$otherKeyword=] - Additional Keyword to include';
+    $comment := '* @returns {string[]}';
+    $comment := '*******************************************************';
+    $sabakeywordsarray := function($otherKeyword){(
+        $keywords :=  $lowercase(contentType.percipioType) = 'channel' ? [localizedMetadata[0].title] : [];
+
+        $keywords := keywords ? $append($keywords,keywords) : $keywords;
+
+        $keywords := $append($keywords, $map(associations.areas, function($v, $i, $a) {
+            $v ? $trim($v) : ''
+        }));
+          
+        $keywords := $append($keywords, $map(associations.subjects, function($v, $i, $a) {
+            $v ? $trim($v) : ''
+        }));
+
+        $keywords := $append($keywords, $map(associations.channels, function($v, $i, $a) {
+            $v.title ? $trim($v.title) : ''
+        }));
+
+        $keywords := $otherKeyword ? $append($keywords, [ $otherKeyword]) : $keywords;
+        
+        $keywords := $map($sort($keywords),function($v, $i, $a){
+            $i != 0 ? (( $v = $a[$i-1] ) ? '': $v) : $v }
+        );
+      
+        $keywords := $filter($keywords, function($v, $i, $a) {
+            $v != ''
+        });
+
+        $keywords
+    )};
+
+    $comment := '*******************************************************';
+    $comment := '* Create JSON object with TAGn keys for populating TAGS in Saba';
+    $comment := '* the values are derived from $sabakeywordsarray() function.';
+    $comment := '* The values are shortened to maximum 25 characters as per Saba spec';
+    $comment := '* The shortened value if it ends with &:- or open bracket is trimmed.';
+    $comment := '* @param {number} [$maxCount=10] - The max number of TAGn keys';
+    $comment := '* @returns {Object}';
+    $comment := '*******************************************************';
+    $sabatagsobject := function($maxCount){(
+        $tagmaxlength:= 25;
+        $maxtags := $maxCount ? $maxCount : 10;
+        $padarray := [1..$maxtags].('');
+
+        $tags := $sabakeywordsarray();
+
+        $tags := $map($tags, function ($v, $i, $a) {(
+            $badendofline:= /(([&:-]|[\x28])$)/;
+            $result := $v ? $ellipsis($v,$tagmaxlength,'') : '';
+            $result := $replace($result, $badendofline, '');
+            $trim($result)
+        )});
+
+        $tags := $map($sort($tags), function ($v, $i, $a) {
+            $i != 0 ? (($v = $a[$i - 1]) ? '' : $v) : $v
+        });
+
+        $tags := $append($tags, $padarray);
+
+        $tags := $filter($tags, function ($v, $i, $a) {
+            $i < $maxtags
+        });
+        
+        $tag_key_value_string_combined := $map($tags, function ($v, $i, $a) {
+            'TAG' & ($i + 1) & '~|~' & $v
+        });
+        
+        $convert_to_TAGn_values := $tag_key_value_string_combined.{$substringBefore('~|~'): $substringAfter('~|~')};
+        
+        $convert_to_TAGn_values
+    )};
+
+    $comment := '*******************************************************';
+    $comment := '* Create JSON object with CATEGORYn keys for populating CATEGORIES';
+    $comment := '* in Saba the values are derived from this data:';
+    $comment := '*   localizedMetadata[0].title if contentType.percipioType is channel';
+    $comment := '*   associations.channels[*].title';
+    $comment := '* @param {string} [$category=Skillsoft] The base category name to use';
+    $comment := '*   used as prefix to channel title';
+    $comment := '* @param {number} [$maxCount=10] - The max number of CATEGORYn keys';    
+    $comment := '* @returns {Object}';
+    $comment := '*******************************************************';
+    $sabacategoriesobject := function($category, $maxCount){(
+        $basecategory:= $category ? $category: 'Skillsoft';
+        $maxcategories := $maxCount ? $maxCount : 10;
+        $padarray := [1..$maxcategories].('');
+
+        $categories :=  $lowercase(contentType.percipioType) = 'channel' ? [$basecategory &'\\'&localizedMetadata[0].title] : $count(associations.channels) = 0 ? [$basecategory] : [];
+
+        $categories := $append($categories, $map(associations.channels, function ($v, $i, $a) {
+            $v.title ? $trim($basecategory &'\\'&$v.title) : ''
+        }));
+        
+        $categories := $map($sort($categories), function ($v, $i, $a) {
+            $i != 0 ? (($v = $a[$i - 1]) ? '' : $v) : $v
+        });
+        
+        $categories := $filter($categories, function ($v, $i, $a) {
+            $v != ''
+        });
+        $categories := $append($categories, $padarray);
+        
+        $categories := $filter($categories, function ($v, $i, $a) {
+            $i < $maxcategories
+        });
+
+        $key_value_string_combined := $map($categories, function ($v, $i, $a) {
+            'CATEGORY' & ($i + 1) & '~|~' & $plainstring($v)
+        });
+        
+        $convert_to_values := $key_value_string_combined.{$substringBefore('~|~'): $substringAfter('~|~')};
+        
+        $convert_to_values
+    )};
+
+    $comment := '*******************************************************';
+    $comment := '* Get local image filename';
+    $comment := '* @param {string} [$id] - The item unqiue id';
+    $comment := '* @param {string} [$imageurl] - The URL to the thumbnail';
+    $comment := '* @returns {string}';
+    $comment := '*******************************************************';
+    $sabaimagefilename := function($id, $imageurl) {(
+    	$myimageextension := $imageurl ? $trim($getDocumentExtension($stripQueryStringandHash($imageurl))) : '';
+        $myid := $id ? $trim($id) : '';
+        $mydelimiter := $myimageextension = '' ? '' : '.';
+        $join([$myid,$myimageextension],$mydelimiter)
+    )};
+
+    $comment := 'End of Saba Release 45/Customer Specific Functions';
+    $comment := '*******************************************************';
+    $comment := '*******************************************************';
+
+
+
+    $comment := '*******************************************************';
+    $comment := '*******************************************************';
+    $comment := 'Start of Saba Release 45/Customer Specific Variables';
+    $comment := 'These are the values that can be changed per customer';
+    $comment := 'Refer to SABA PERCIPIO IMPLEMENTATION GUIDE';
+
+
+    $comment := '* The DOMAIN that must exist in Saba where the active Percipio Content';
+    $comment := '* should be';
+    $saba_ACTIVEDOMAIN := $exists($override.saba.activedomain) ? $override.saba.activedomain :'World';
+
+    $comment := '* The DOMAIN that must exist in Saba where the inactive Percipio Content';
+    $comment := '* should be';
+    $saba_ARCHIVEDOMAIN := $exists($override.saba.archivedomain) ? $override.saba.archivedomain :'Archive';
+
+    $comment := '* The CONTENT PROVIDER this value must exist in Saba, and must be a';
+    $comment := '* URL Vendor so xAPI works';
+    $saba_CONTENTPROVIDER := $exists($override.saba.contentprovider) ? $override.saba.contentprovider :'Percipio_URL_Vendor';
+    
+    $comment := '* The DELIVERY VENDOR this value must exist in Saba';
+    $saba_DELIVERYVENDOR := $exists($override.saba.deliveryvendor) ? $override.saba.deliveryvendor :'Saba';
+ 
+    $comment := '* The CONTENT folder where content is added that must exist in Saba content';
+    $comment := '* library';
+    $saba_CONTENTFOLDER := $exists($override.saba.contentfolder) ? $override.saba.contentfolder :'PERCIPIO_CONTENT';
+
+    $comment := '* The PLAYER TEMPLATE that must exist in Saba';
+    $saba_PLAYERTEMPLATE :=  $exists($override.saba.playertemplate) ? $override.saba.playertemplate :'Percipio';
+
+    $comment := '* The CONTENT SERVER where content is added that must exist in Saba content';
+    $saba_CONTENTSERVER := $exists($override.saba.contentserver) ? $override.saba.contentserver :'Saba Default Content Server';
+
+    $comment := '* The SABA Account that must exist in Saba that owns this content';
+    $saba_OWNER := $exists($override.saba.owner) ? $override.saba.owner :'SSADMIN';
+
+    $comment := '* The MAPPING between Percipio localeCode to SABA language string';
+    $comment := '* The PERCIPIO (left side) value is the lower case value before the';
+    $comment := '* hyphen in the locale i.e. en-us -> en; fr-FR -> fr';
+    $saba_LANGUAGEMAP := $exists($override.saba.languagemap) ? $override.saba.languagemap : {
+              'en': 'English',
+              'fr': 'French',
+              'de': 'German',
+              'es': 'Spanish'
+            };
+
+    $comment := '* The default SABA language string to use if the map does not succeed';
+    $saba_DEFAULTLANGUAGE := $exists($override.saba.defaultlanguage) ? $override.saba.defaultlanguage :'English';
+
+    $comment := '* The MAPPING between Percipio contentType.percipioType lowercase';
+    $comment := '* that controls whether type can be marked COMPLETED thru receipt';
+    $comment := '* of a COMPLETED xAPI statement from Percipio';
+    $saba_MARKCOMPLETEEXTERNALMAP := $exists($override.saba.markcompleteexternalmap) ? $override.saba.markcompleteexternalmap : {
+                'audiobook': 'TRUE',
+                'book': 'TRUE',
+                'channel': 'FALSE',
+                'course': 'TRUE',
+                'linked_content': 'TRUE',
+                'video': 'TRUE'
+              };
+
+    $comment := '* The PREFIX combined with contentType.displayLabel that is used';
+    $comment := '* for SABA Delivery types. The Delivery types must exist in SABA';
+    $comment := '* If no prefix needed set to empty string, make sure to include';
+    $comment := '* trailing space if defined';
+    $saba_DELIVERYTYPEPREFIX := $exists($override.saba.deliverytypeprefix) ? $override.saba.deliverytypeprefix : 'Skillsoft ';
+
+    $comment := '* The default SABA Author string to use if the by array is empty';
+    $comment := '* in the Percipio data';
+    $saba_DEFAULTAUTHOR := $exists($override.saba.defaultauthor) ? $override.saba.defaultauthor :'Skillsoft';
+
+    $comment := '* The number of TAGSn values to include set to 0 to not return any';
+    $comment := '* For more information see the $sabatagsobject function above';
+    $saba_MAXTAGS := $exists($override.saba.maxtags) ? $override.saba.maxtags : 5;
+    
+    $comment := '* The number of CATEGORYn values to include set to 0 to not return any';
+    $comment := '* For more information see the $sabacategoriesobject function above';
+    $saba_MAXCATEGORIES := $exists($override.saba.maxcategories) ? $override.saba.maxcategories : 5;
+    
+    $comment := '* The base Category value to use in the $sabacategoriesobject function above';
+    $saba_BASECATEGORY := $exists($override.saba.basecategory) ? $override.saba.basecategory : 'Skillsoft';
+    
+    $comment := '* The Saba mobilecompatabilty value to use in the transform';
+    $comment := '* The current options based on Saba 45.0.0.202 are:';
+    $comment := '* Value    UI Name';
+    $comment := '* allDevices    All Devices';
+    $comment := '* notCompatible    Not Compatible';
+    $comment := '* iPhone    iPhone';
+    $comment := '* iPad    iPad';
+    $comment := '* both    iPhone and iPad';
+    $comment := '* androidSmall    Android Small Size Device';
+    $comment := '* androidNormal    Android Normal Size Device';
+    $comment := '* androidLargeAndAbove    Android Large and Above Size Device';
+    $comment := '* iPhone-responsive    iPhone-responsive';
+    $comment := '* iPad-responsive    iPad-responsive';
+    $comment := '* both-responsive    iPhone and iPad-responsive';
+    $comment := '* allDevice-responsive    AllDevices-responsive';
+    $comment := '* allLargeDevices    All Large Devices-responsive';
+    $comment := '* allSmallDevices    All Small Devices-responsive';
+    $saba_MOBILECOMPATABILTY := $exists($override.saba.mobilecompatabilty) ? $override.saba.mobilecompatabilty : 'allDevice-responsive';
+
+    $comment := 'End of Saba Release 45/Customer Specific Variables';
+    $comment := '*******************************************************';
+    $comment := '*******************************************************';
+
 
     $comment := '*******************************************************';
     $comment := '*******************************************************';
@@ -662,26 +888,81 @@ $.(
 
     $transformed_data := (
         $.{
-            'UUID': id ? id : '',
-            'Title':  localizedMetadata[0].title ? $metadatatitle($commonIncludeContentTypeInTitle, $commonIncludeTechnologyDetailsInTitle, 254) : '',
-            'Description': localizedMetadata[0].description ? $commonUseExtendedDescription ? $metadataextendeddescription(2000,$commonExtendedDescriptionEOL) : $metadatadescription(2000) : '',
-            'Launch': link ? $metadatasharelink($commonShareLinkParametersLookup) : '',
-            'Thumbnail' : imageUrl ? imageUrl : '',
-            'Type' : contentType ? contentType.displayLabel : '',
-            'Duration': duration ? $isodurationtohhmmss(duration) : '00:00:00',
-            'Modality': (
-                modalities ? $join(modalities,'|') : ''
-            ),
-            'Status': lifecycle.status,
-            'Language': localeCodes[0] ? $rfc5646language(localeCodes[0]) : '',
-            'Locale': localeCodes[0] ? localeCodes[0] : ''
-          }
+        'ID': '',
+        'CONTENTTITLE': localizedMetadata[0].title ? $metadatatitle($commonIncludeContentTypeInTitle, $commonIncludeTechnologyDetailsInTitle, 254) : '',
+        'NEW_CONTENTTITLE': localizedMetadata[0].title ? $metadatatitle($commonIncludeContentTypeInTitle, $commonIncludeTechnologyDetailsInTitle, 254) : '',
+        'NEW_COURSETITLE': localizedMetadata[0].title ? $metadatatitle($commonIncludeContentTypeInTitle, $commonIncludeTechnologyDetailsInTitle, 254) : '',
+        'CONTENTFORMAT': 'URL',
+        'SPLIT': lifecycle.status = 'ACTIVE' ? $saba_ACTIVEDOMAIN : $saba_ARCHIVEDOMAIN,
+        'PLAYERTEMPLATE': $saba_PLAYERTEMPLATE,
+        'ZIPFILENAME': '',
+        'CSFILESTITLE': '',
+        'CSFILESRELATIVEPATH': '',
+        'CREATEWBTCOURSE': 'TRUE',
+        'MOBILECOMPATIBILITY': $saba_MOBILECOMPATABILTY,
+        'CONTENTFOLDER': $saba_CONTENTFOLDER,
+        'CONTENTTYPE': 'Website',
+        'EXTERNALID': xapiActivityId,
+        'COURSE_NO': id,
+        'AVAILABLEOFFLINE': '',
+        'VERSION': '',
+        'CONTENTPROVIDER': $saba_CONTENTPROVIDER,
+        'DELIVERYVENDOR': $saba_DELIVERYVENDOR,
+        'SECURECONTEXT': '',
+        'CONTENTSERVER': $saba_CONTENTSERVER,
+        'LOCATIONORURL': $metadatasharelink($commonShareLinkParametersLookup),
+        'LAUNCHURL': $metadatasharelink($commonShareLinkParametersLookup),
+        'CONTENTDESCRIPTION': localizedMetadata[0].description ? $commonUseExtendedDescription ? $metadataextendeddescription(2000,$commonExtendedDescriptionEOL) : $metadatadescription(2000) : '',
+        'COURSE_ABSTRACT': localizedMetadata[0].description ? $commonUseExtendedDescription ? $metadataextendeddescription(1000,$commonExtendedDescriptionEOL) : $metadatadescription(1000) : '',
+        'OWNER': $saba_OWNER,
+        'SUREVALMRA': '',
+        'ISSCORING': 'FALSE',
+        'ESIGNATURE': '',
+        'USEAICCBRIDGE': '',
+        'ISSECURE': '',
+        'AUTHOR': $count(by) = 0 ? $saba_DEFAULTAUTHOR : $trim($substring($join(by, ', '), 0, 255)),
+        'LANGUAGE': (
+                $language := $lookup($saba_LANGUAGEMAP, ($lowercase(localeCodes[0] ? $split(localeCodes[0],'-')[0] : 'en')));
+                $language ? $language : $saba_DEFAULTLANGUAGE
+        ),
+        'KEYWORDS' :  (
+            $keywordsarray := $sabakeywordsarray();
+            $count($keywordsarray) = 0 ? '' : $join($keywordsarray,',')
+        ),
+        'CONTENT_STATUS': lifecycle.status = 'ACTIVE' ? 'PUBLISHED' : 'ON_HOLD',
+        'COURSE_IMAGE': $sabaimagefilename(id, imageUrl),
+        'DESCRIPTION': localizedMetadata[0].description ? $commonUseExtendedDescription ? $metadataextendeddescription(2000,$commonExtendedDescriptionEOL) : $metadatadescription(2000) : '',
+        'DISPLAY_CALL_CENTER': lifecycle.status = 'ACTIVE' ? 'TRUE' : 'FALSE',
+        'DISPLAY_LEARNER': lifecycle.status = 'ACTIVE' ? 'TRUE' : 'FALSE',
+        'WBT_DURATION': $isodurationtohhmm(duration),
+        'WBT_DESCRIPTION': localizedMetadata[0].description ? $commonUseExtendedDescription ? $metadataextendeddescription(2000,$commonExtendedDescriptionEOL) : $metadatadescription(2000) : '',
+        'MARK_COMPLETE_EXTERNALLY': (
+            $markComplete := $lookup($saba_MARKCOMPLETEEXTERNALMAP, $lowercase(contentType.percipioType));
+            $markComplete ? $markComplete : 'FALSE';
+        ),
+        'DELIVERY_TYPE': $trim($saba_DELIVERYTYPEPREFIX & contentType.displayLabel),
+        'DISCONTINUE_FROM' : lifecycle.status = 'ACTIVE' ? '' : $substringBefore($now(),'T'),
+        'EXPIRATIONDATE' : lifecycle.status = 'ACTIVE' ? '' : $substringBefore($now(),'T'),
+        'DROP_REGISTRATIONS' : lifecycle.status = 'ACTIVE' ? '' : 'TRUE',
+        'DISCONTINUE_ALL_ENROLLMENTS' : lifecycle.status = 'ACTIVE' ? '' : 'TRUE',
+        'REMOVE_COURSE_FROM_ALL_PLANS': lifecycle.status = 'ACTIVE' ? '' : 'TRUE',
+        'COURSE_HIDE_CLASSMATES': 'FALSE',
+        'COURSE_TARGET_DAYS': 0,
+        'LXP_CONTENT': 'FALSE'
+      }
     );
 
     $comment := '*******************************************************';
     $comment := 'Combine the :';
     $comment := '   $transformed_data - Basic transfomed data';
+    $comment := '   $sabatagsobject - The TAGSn data derived from the function';
+    $comment := '                        if $saba_MAXTAGS != 0';
+    $comment := '   $sabacategoriesobject - The CATEGORYn data derived from the function';
+    $comment := '                        if $saba_MAXCATEGORIES != 0';
 
-    $results := $transformed_data;
+    $tags :=  $saba_MAXTAGS = 0 ? [] : $sabatagsobject($saba_MAXTAGS);
+    $categories :=  $saba_MAXCATEGORIES = 0 ? [] : $sabacategoriesobject($saba_BASECATEGORY, $saba_MAXTAGS);
+
+    $results := $merge([$transformed_data, $tags,  $categories]);
     $results;
 )
